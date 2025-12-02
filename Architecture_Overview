@@ -1,0 +1,182 @@
+# S.H.I.E.L.D.: Architectural Overview
+
+## 1.0 Introduction
+
+The following provides a comprehensive architectural overview of the **S.H.I.E.L.D.** front-end application, a multi-agent dashboard designed for Security Operations Center (SOC) monitoring and response. It is intended to serve as a high-level technical guide for software architects and senior developers involved in the system's development and maintenance.  
+
+The scope of this overview encompasses the core technology stack, the application's state management model, the modular services that encapsulate key functionalities, and the primary operational logic of the agent-based analysis pipeline. By detailing these fundamental pillars, this document aims to foster a clear and unified understanding of the system's design and operational flow, beginning with the specific technologies selected to build the application.
+
+---
+
+## 2.0 Core Technology Stack & Front-End Architecture
+
+The **S.H.I.E.L.D.** dashboard is built upon a modern, component-based architecture, a strategic choice designed to manage the complexity inherent in a real-time security monitoring interface. The selection of **React** as the core library provides a robust foundation for developing a modular, scalable, and maintainable user interface.
+
+This approach allows complex UI elements to be broken down into independent, reusable components, which is essential for a data-dense application like a SOC dashboard.
+
+### Primary Technologies
+
+| Technology / Library | Architectural Role |
+|--------|------|
+| **React** | Serves as the fundamental library for building the user interface. The architecture heavily utilizes a component-based model and leverages React Hooks (`useState`, `useEffect`, `useRef`) for managing component-level state, orchestrating side effects, and controlling the application lifecycle. |
+| **Recharts** | A declarative data visualization library used to render charts and graphs in views like `EXEC_SUMMARY` and `SOC_OPS` (e.g., `BarChart`, `AreaChart`, `PieChart`). |
+| **Lucide-React** | Provides a comprehensive library of clean and consistent SVG icons to enhance UI clarity and navigation. |
+
+### Component Hierarchy
+
+- **General-Purpose Components**
+  - `Terminal`
+  - `StatCard`
+  - `ScannerVisual`
+
+- **View Components**
+  - `ViewNetworkOps`
+  - `ViewVulnerabilityScanner`
+  - `ViewUserActivity`
+
+These views are organized into domain-specific folders:
+- Infrastructure
+- Governance
+- Forensics
+
+This structure supports a **Single Page Application (SPA)** model, allowing smooth navigation without page reloads, which is vital for real-time monitoring environments.
+
+---
+
+## 3.0 Application State Management
+
+The application uses a **centralized but localized state management strategy** within the main `App` component using React Hooks (`useState`, `useRef`).
+
+### Core System State
+
+| State Variable | Type / Default | Responsibility |
+|------|------|------|
+| `isRunning` | boolean (false) | Toggles the primary processing loop |
+| `currentAgent` | string ('IDLE') | Tracks the active agent |
+| `pendingReview` | object or null | Stores threats requiring human review |
+| `processingRef` | MutableRef<boolean> | Prevents concurrent pipeline runs |
+
+### Data & Logging State
+
+| State Variable | Type | Responsibility |
+|------|------|------|
+| `logs` | string[] | Terminal logging |
+| `scanHistory` | ScanResult[] | Recent decisions + chart data |
+| `currentEmail` | EmailData / null | Current email being analyzed |
+| `currentAnalysis` | ThreatAnalysis | Analysis results |
+| `userActivityLogs` | LogEntry[] | Insider threat activity |
+
+### UI & Navigation State
+
+| State Variable | Type / Default | Responsibility |
+|------|------|------|
+| `activeView` | string ('SOC_OPS') | Main content routing |
+| `isSidebarOpen` | boolean (true) | Sidebar toggle |
+| `showSettings` | boolean (false) | Settings modal visibility |
+
+### Dashboard Metrics
+
+| State Variable | Type | Responsibility |
+|------|------|------|
+| `threatLevel` | SecurityStatus | Overall system status |
+| `blockedCount` | number | Threats blocked |
+| `scannedCount` | number | Items scanned |
+| `activeUsers` | number (12) | Contextual metric |
+
+### External Integration State
+
+| State Variable | Type | Responsibility |
+|------|------|------|
+| `dataSource` | 'MOCK' / 'GMAIL' | Input source |
+| `gmailToken` | string | Gmail API auth |
+| `processedGmailIds` | Set | Prevents duplicate scanning |
+
+The agent loop is managed with a `useEffect` + `setInterval(1000ms)` system and cleaned up using `clearInterval` on unmount.
+
+---
+
+## 4.0 System Services & External Integrations
+
+### 4.1 Shield Engine
+
+| Function | Purpose |
+|------|------|
+| `runHeuristicScan` | Initial scoring |
+| `runCognitiveScan` | Deep analysis |
+| `checkFileHash` | Malware simulation |
+| `checkInsiderThreats` | Insider behavior detection |
+
+---
+
+### 4.2 Gmail Tool
+
+Integrates with Gmail API via OAuth token to retrieve messages and prevent reprocessing using `processedGmailIds`.
+
+---
+
+### 4.3 Memory Bank
+
+Stores **Indicators of Compromise (IOCs)**:
+- Sender email
+- File hash
+
+Used for **instant threat recall** and bypassing full scans for known threats.
+
+---
+
+## 5.0 Core Operational Logic: Agent Pipeline
+
+**runAgentPipeline** drives the system workflow:
+
+1. **Pre-checks** – prevent parallel execution
+2. **Data ingestion** – `fetchNextEmail()`
+3. **SENTINEL** – `runHeuristicScan()`
+4. **COGNITIVE** – deeper analysis if risk > 20
+5. **INTERVENTION** – human review for 50–75 range
+6. **PARALLEL** – malware + insider analysis (Promise.all)
+7. **Adjudication** – final verdict & logging
+
+**Final Actions:**
+- `LOCK_AND_BLOCK`
+- `MONITOR`
+- `SAFE`
+
+---
+
+## 6.0 User Interface Structure & Navigation
+
+### Navigation Groups
+
+- **Security Posture**
+  - `EXEC_SUMMARY`
+  - `SOC_OPS`
+  - `RISK_ANALYSIS`
+
+- **Infrastructure & IDS**
+  - `NETWORK_OPS`
+  - `IDS_MANAGER`
+
+- **Incident Review**
+  - `THREAT_INTEL`
+  - `AUDIT`
+
+- **GRC & Frameworks**
+  - `THREAT_MODEL`
+  - `RISK_GOV`
+
+- **Forensics & Scans**
+  - `VULN_SCANNER`
+  - `FORENSICS_LAB`
+
+- **Identity & Endpoint**
+  - `ACCESS`
+  - `ENDPOINT`
+  - `USER_ACTIVITY`
+
+- **Integrations**
+  - `OSS_TOOLS`
+
+The active view is controlled by:
+
+```js
+{activeView === 'SOC_OPS' && <ViewSocOps />}
