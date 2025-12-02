@@ -9,7 +9,7 @@
 
 Instead of relying solely on static rules or expensive LLM calls for every log, S.H.I.E.L.D. utilizes a **Sequential & Parallel Multi-Agent Pipeline** to triage, analyze, and mitigate threats autonomously. It acts as a "Single Pane of Glass" for enterprise security, consolidating Forensics, Network Operations, Identity Management, and GRC into one unified interface.
 
-![Dashboard Preview]((https://s-h-i-e-l-d-dashboard-795860681266.us-west1.run.app))
+Dashboard Preview: https://s-h-i-e-l-d-dashboard-795860681266.us-west1.run.app
 
 ## 🧠 Cognitive Architecture
 
