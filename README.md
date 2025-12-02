@@ -7,7 +7,7 @@
 
 **S.H.I.E.L.D.** is a Multi-Agent Security Orchestration platform designed to solve the "Alert Fatigue" crisis in modern Security Operations Centers (SOCs). 
 
-Instead of relying solely on static rules or expensive LLM calls for every log, S.H.I.E.L.D. utilizes a **Sequential Multi-Agent Pipeline** to triage, analyze, and mitigate threats autonomously. It acts as a "Single Pane of Glass" for enterprise security, consolidating Forensics, Network Operations, Identity Management, and GRC into one unified interface.
+Instead of relying solely on static rules or expensive LLM calls for every log, S.H.I.E.L.D. utilizes a **Sequential & Parallel Multi-Agent Pipeline** to triage, analyze, and mitigate threats autonomously. It acts as a "Single Pane of Glass" for enterprise security, consolidating Forensics, Network Operations, Identity Management, and GRC into one unified interface.
 
 ![Dashboard Preview](https://via.placeholder.com/800x400?text=SHIELD+Dashboard+Preview)
 
@@ -40,6 +40,7 @@ This agent demonstrates mastery of the following course concepts:
 ### 🔬 Forensics Lab (Level 1)
 *   **Evidence Locker:** Manages artifacts (Memory Dumps, PCAP files).
 *   **Automated Triage:** Simulates running tools like **Velociraptor** and **Volatility 3** to analyze infected assets without human touch.
+*   **Vulnerability Scanner:** Integration view for OpenVAS/Nmap results.
 
 ### 🌐 Network & Infrastructure
 *   **NOC View:** Manage Routing Tables, VPN Tunnels, and Access Control Lists (ACLs).
@@ -49,6 +50,10 @@ This agent demonstrates mastery of the following course concepts:
 *   **Risk Analysis (FAIR Model):** Quantitative risk scoring with Monte Carlo forecasting.
 *   **Threat Modeling:** Visualizes STRIDE and LINDDUN frameworks via Radar charts.
 *   **Compliance:** Real-time ISO 27001 control monitoring.
+
+### 🔒 Security & Identity
+*   **IAM Dashboard:** Monitor User Risk Scores, MFA enforcement, and Privilege Escalation attempts.
+*   **Endpoint Security:** Track Encryption status (BitLocker), EDR coverage, and Asset Hardening.
 
 ## 🛠️ Installation & Setup
 
@@ -99,10 +104,15 @@ This agent demonstrates mastery of the following course concepts:
     *   `shieldEngine.ts`: Core logic for Sentinel, Cognitive, and Parallel agents.
     *   `memoryBank.ts`: Long-term memory service.
     *   `gmailTool.ts`: REST client for Gmail API.
+*   `/src/components/views`: Modular dashboard components.
+    *   `Infrastructure.tsx`: Network & IDS views.
+    *   `Forensics.tsx`: Vuln Scanner & Forensics Lab.
+    *   `Governance.tsx`: Risk, Compliance, Threat Models.
+    *   `Ops.tsx`: Threat Intel, Audit, OSS Tools.
+    *   `Security.tsx`: IAM & Endpoint views.
 *   `/src/components`
     *   `ScannerVisual.tsx`: The animated "Brain" of the dashboard.
     *   `StatCard.tsx`, `Terminal.tsx`: UI Widgets.
-*   `/src/types.ts`: TypeScript definitions for Security Events.
 
 ## 📄 License
 MIT License. Created for the Google Gen AI "Enterprise Agents" Capstone.
